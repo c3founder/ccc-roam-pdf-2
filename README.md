@@ -1,1 +1,4 @@
-# ccc-roam-pdf-2
+
+# Functionalities
+Full tutorial here: 
+    - Under construction...

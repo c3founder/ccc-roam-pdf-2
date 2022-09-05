@@ -1,0 +1,105 @@
+[data-tag^="h:"],
+[data-tag^="u:"],
+[data-tag^="s:"],
+[data-tag^="q:"] {
+  display: none !important;
+}
+
+.Dropdown {
+  width: 50px !important;
+}
+
+[data-tag^="c3-pdf-highlight"] {
+  display: none !important;
+}
+
+
+[data-page-links*="c3-pdf-highlight"]>div>.rm-block-text {
+  border: 3px solid rgb(255, 65, 65) !important;
+  border-style: inset !important;
+  border-radius: 10px;
+  box-shadow: 5px 5px 3px #aaaaaa;
+}
+
+.btn-ref-annotation {
+  display: none;
+}
+
+span:hover .btn-ref-annotation {
+  display: inline;
+  animation: fade_in_show .8s
+}
+
+@keyframes fade_in_show {
+  0% {
+    opacity: 0;
+    transform: scale(0)
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1)
+  }
+}
+
+span {
+  text-underline-offset: .5px !important;
+}
+
+/*All btns*/
+.btn {
+  padding: 0px !important;
+  border: 3px !important;
+}
+
+/*All main highlight btns*/
+.btn-pdf-activated {
+  min-width: 18px !important;
+  min-height: 18px !important;
+  margin-top: 0px !important;
+}
+
+.btn-delete {
+  background-color: Transparent !important;
+  border: none !important;
+  background-image: none !important;
+  box-shadow: none !important;
+}
+
+.btn-rep-text {
+  background-color: Transparent !important;
+  border: none !important;
+  background-image: none !important;
+  box-shadow: none !important;
+}
+
+.btn-comment {
+  background-color: Transparent !important;
+  border: none !important;
+  background-image: none !important;
+  box-shadow: none !important;
+}
+
+.btn-scrollto {
+  border-radius: 14px !important;
+  font-size: 12px !important;
+  font-weight: bold;
+}
+
+/* Hide PDF Breadcrumb */
+.parent-path-wrapper>div>span>div>div {
+  display: none;
+}
+
+.rm-block-ref.has-annotation {
+  border-bottom: 0px !important;
+}
+
+.pdf .rm-block-main {
+  margin-left: -35px !important;
+  margin-right: -35px !important;
+}
+
+.pdf .rm-bullet {
+  visibility: hidden;
+}
