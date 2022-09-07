@@ -3,7 +3,7 @@ const panelConfig = {
   settings: [
     {
       id: "highlightHeading",
-      name: "Highlight heading in cousin mode.",
+      name: "Highlight heading to be printed in cousin mode. To switch to cousin mode, click on the button in the top right of the viewer.",
       action: {
         type: "input",
         placeholder: "**Highlights**",
@@ -12,8 +12,8 @@ const panelConfig = {
     },
     {
       id: "appendHighlight",
-      name: "Print highlight to the end.",
-      description: "Append: true, Prepend: false",
+      name: "Append or prepend highlights.",
+      description: "Append: on, Prepend: off",
       action: {
         type: "switch",
         onChange: (evt) => pdfParams.appendHighlight = evt.target.checked
@@ -40,12 +40,12 @@ const panelConfig = {
       }
     },
     {
-      id: "blockQPerfix",
-      name: "Block Quote Perfix",
+      id: "blockQPrefix",
+      name: "Block Quote Prefix",
       action: {
         type: "select",
-        items: ['', '>', '[[>]]'],
-        onChange: (item) => pdfParams.blockQPerfix = item
+        items: ['None', '>', '[[>]]'],
+        onChange: (item) => pdfParams.blockQPrefix = item
       }
     }
   ]
@@ -222,7 +222,7 @@ function onload({ extensionAPI }) {
     pdfParams.appendHighlight = setSettingDefault(extensionAPI, 'appendHighlight', 'true');
     pdfParams.pdfMinHeight = setSettingDefault(extensionAPI, 'pdfMinHeight', 900);
     pdfParams.citationFormat = setSettingDefault(extensionAPI, 'citationFormat', '');
-    pdfParams.blockQPerfix = setSettingDefault(extensionAPI, 'blockQPerfix', '');
+    pdfParams.blockQPrefix = setSettingDefault(extensionAPI, 'blockQPrefix', '');
 
     extensionAPI.settings.panel.create(panelConfig);
 
@@ -634,8 +634,8 @@ function startC3Pdf2Extension() {
     onunloadfns.push(() => window.removeEventListener('message', handleRecievedMessage));
     ///////////Recieve Highlight Data, Output Highlight Text, Store HL Data 
     async function handleRecievedMessage(event) {
-        console.log("in roam: handling messege")
-        console.log(event.data.actionType)
+        // console.log("in roam: handling messege")
+        // console.log(event.data.actionType)
         let isNew;
         const extracted = await extractMessageInfo(event);
         const { actionType } = extracted;
@@ -853,7 +853,7 @@ function startC3Pdf2Extension() {
         const { iframe, hlValue, annotType, page, hexcolor, hlBtn, pdfAlias } = extracted;
         const pdfBlockUid = iframe.id;
         //Make the citation
-        const perfix = (pdfParams.blockQPerfix === '') ? '' : pdfParams.blockQPerfix + ' ';
+        const perfix = (pdfParams.blockQPrefix === 'None') ? '' : pdfParams.blockQPrefix + ' ';
         let Citekey = '';
         if (pdfParams.citationFormat !== '') {
             if (!pdf2citeKey[pdfBlockUid]) {
