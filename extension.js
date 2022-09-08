@@ -1,55 +1,58 @@
 const panelConfig = {
-  tabTitle: "CCC Roam PDF 2.0",
-  settings: [
-    {
-      id: "highlightHeading",
-      name: "Highlight heading to be printed in cousin mode. To switch to cousin mode, click on the button in the top right of the viewer.",
-      action: {
-        type: "input",
-        placeholder: "**Highlights**",
-        onChange: (evt) => { pdfParams.highlightHeading = evt.target.value; }
-      }
-    },
-    {
-      id: "appendHighlight",
-      name: "Append or prepend highlights.",
-      description: "Append: on, Prepend: off",
-      action: {
-        type: "switch",
-        onChange: (evt) => pdfParams.appendHighlight = evt.target.checked
-      }
-    },
-    {
-      id: "pdfMinHeight",
-      name: "PDF Min Height",
-      description: "Min height for viewer",
-      action: {
-        type: "input",
-        placeholder: '900',
-        onChange: (evt) => { pdfParams.pdfMinHeight = evt.target.value.parseInt(); }
-      }
-    },
-    {
-      id: "citationFormat",
-      name: "Citation Format",
-      description: "If no input = disable, Use Citekey and page in any formating string. The page can be offset by `Page Offset` attribute. Common usecase: Zotero imports with 'roam page title' = @Citekey and Citekey attribute examples:'[${Citekey}]([[@${Citekey}]])', '[(${Citekey}, ${page})]([[@${Citekey}]])'",
-      action: {
-        type: "input",
-        placeholder: '',
-        onChange: (evt) => { pdfParams.citationFormat = evt.target.value; }
-      }
-    },
-    {
-      id: "blockQPrefix",
-      name: "Block Quote Prefix",
-      action: {
-        type: "select",
-        items: ['None', '>', '[[>]]'],
-        onChange: (item) => pdfParams.blockQPrefix = item
-      }
-    }
-  ]
+    tabTitle: "CCC Roam PDF 2.0",
+    settings: [
+        {
+            id: "highlightHeading",
+            name: "Highlight heading to be printed in cousin mode.",
+            description: "To switch to cousin mode, click on the button in the top right of the viewer.",
+            action: {
+                type: "input",
+                placeholder: "**Highlights**",
+                onChange: (evt) => { pdfParams.highlightHeading = evt.target.value; }
+            }
+        },
+        {
+            id: "appendHighlight",
+            name: "Append or prepend highlights.",
+            description: "Append: on, Prepend: off",
+            action: {
+                type: "switch",
+                onChange: (evt) => pdfParams.appendHighlight = evt.target.checked
+            }
+        },
+        {
+            id: "pdfMinHeight",
+            name: "PDF Min Height",
+            description: "Min height for viewer",
+            action: {
+                type: "input",
+                placeholder: '900',
+                onChange: (evt) => { pdfParams.pdfMinHeight = evt.target.value.parseInt(); }
+            }
+        },
+        {
+            id: "citationFormat",
+            name: "Citation Format",
+            description: "If no input = disable, Use Citekey and page in any formating string. The page can be offset by `Page Offset` attribute. Common usecase: Zotero imports with 'roam page title' = @Citekey and Citekey attribute examples:'[${Citekey}]([[@${Citekey}]])', '[(${Citekey}, ${page})]([[@${Citekey}]])'",
+            action: {
+                type: "input",
+                placeholder: '',
+                onChange: (evt) => { pdfParams.citationFormat = evt.target.value; }
+            }
+        },
+        {
+            id: "blockQPrefix",
+            name: "Block Quote Prefix",
+            action: {
+                type: "select",
+                items: ['None', '>', '[[>]]'],
+                onChange: (item) => pdfParams.blockQPrefix = item
+            }
+        }
+    ]
 };
+
+
 
 let ccc = {};
 
@@ -77,7 +80,7 @@ ccc.util = ((c3u) => {
         const status = window.roamAlphaAPI.createPage(
             {
                 "page":
-                { "title": pageTitle, "uid": pageUid }
+                    { "title": pageTitle, "uid": pageUid }
             })
         return status ? pageUid : null
     }
@@ -210,12 +213,41 @@ ccc.util = ((c3u) => {
 /*******************Parameter END***********************/
 /*******************************************************/
 function setSettingDefault(extensionAPI, settingId, settingDefault) {
-  let storedSetting = extensionAPI.settings.get(settingId);
-  if (null == storedSetting) extensionAPI.settings.set(settingId, settingDefault);
-  return storedSetting || settingDefault;
+    let storedSetting = extensionAPI.settings.get(settingId);
+    if (null == storedSetting) extensionAPI.settings.set(settingId, settingDefault);
+    return storedSetting || settingDefault;
 }
 
 let pdfParams = {};
+let fullScreenState = 'Half'
+function mainFullScreen(props) {
+    console.log(props);
+
+    return React.createElement("iframe",
+        {
+            width: "100%",
+            height: "100%",
+            src: props.url,
+            'data-pdf': props.pdf,
+            'data-uid': props.uid,
+            id: props.id,
+            class: 'pdf-activated-full-screen',
+
+        })
+    // return (
+    //     <iframe>
+    //         width= "100%"
+    //         height= "100%"
+    //         src= {props.url},
+    //         data-pdf= {props.pdf}
+    //         data-uid= {props.uid}
+    //         id= props.id,
+    //         class= 'pdf-activated-full-screen'
+    //     </iframe>
+    // )
+
+}
+
 
 function onload({ extensionAPI }) {
     pdfParams.highlightHeading = setSettingDefault(extensionAPI, 'highlightHeading', '**Highlights**');
@@ -225,6 +257,7 @@ function onload({ extensionAPI }) {
     pdfParams.blockQPrefix = setSettingDefault(extensionAPI, 'blockQPrefix', '');
 
     extensionAPI.settings.panel.create(panelConfig);
+    roamAlphaAPI.ui.mainWindow.registerComponent("mainFullScreen", mainFullScreen);
 
     startC3Pdf2Extension();
 }
@@ -234,6 +267,7 @@ let onunloadfns = [];
 
 function onunload() {
     if (hlBtnAppearsObserver) hlBtnAppearsObserver.disconnect();
+    roamAlphaAPI.ui.mainWindow.unregisterComponent("mainFullScreen");
 
     for (const f of onunloadfns) {
         console.log(f);
@@ -241,6 +275,8 @@ function onunload() {
     }
     onunloadfns = [];
 }
+
+
 
 
 function startC3Pdf2Extension() {
@@ -259,12 +295,14 @@ function startC3Pdf2Extension() {
             if (!iframe.classList.contains('pdf-activated')) {
                 try {
                     if (new URL(iframe.src).pathname.endsWith('.pdf')) {
-                        iframe.pdf = iframe.src; //the permanent pdfUrl
+                        iframe.dataset.pdf = iframe.src; //the permanent pdfUrl
                         iframe.id = "pdf-" + iframe.closest('.roam-block').id; //window level pdfId          
-                        iframe.uid = c3u.getUidOfContainingBlock(iframe); //for click purpose
-                        allPdfIframes.push(iframe); //save for interaction
+                        iframe.dataset.uid = iframe.id.slice(-9);//c3u.getUidOfContainingBlock(iframe); //for click purpose
                         renderPdf(iframe); //render pdf through the server 
                         initialHighlighSend(iframe);
+                    } else if (iframe.classList.contains('pdf-activated-full-screen')) {
+                        initialHighlighSend(iframe);
+                        iframe.classList.add('pdf-activated')
                     }
                 } catch { } // some iframes have invalid src
             }
@@ -289,13 +327,18 @@ function startC3Pdf2Extension() {
     ///////////////Responsive PDF Iframe 
     function adjustPdfIframe(iframe) {
         const reactParent = iframe.closest('.react-resizable')
-        const reactHandle = reactParent.querySelector(".react-resizable-handle")
+        const reactHandle = reactParent?.querySelector(".react-resizable-handle")
         const hoverParent = iframe.closest('.hoverparent')
-        reactHandle.style.display = 'none';
-        reactParent.style.width = '100%';
-        reactParent.style.height = '100%';
-        hoverParent.style.width = '100%';
-        hoverParent.style.height = '100%';
+        if (reactHandle)
+            reactHandle.style.display = 'none';
+        if (reactParent) {
+            reactParent.style.width = '100%';
+            reactParent.style.height = '100%';
+        }
+        if (hoverParent) {
+            hoverParent.style.width = '100%';
+            hoverParent.style.height = '100%';
+        }
     }
     /************************Main END***********************/
     /*******************************************************/
@@ -572,7 +615,7 @@ function startC3Pdf2Extension() {
             : null;
         iframe?.contentWindow.postMessage({
             highlights: focusHighlight, actionType: action, iframeId: iframe.id,
-            dataBlockStr: dataBlockString,
+            dataBlockStr: dataBlockString, isFullScreen: iframe.classList.contains('pdf-activated-full-screen'),
             userName: getCurrentUserDisplayName()
         }, '*');
     }
@@ -589,9 +632,13 @@ function startC3Pdf2Extension() {
     function getFirstOpenIframeInstance(pdfInfo) {
         return Array.from(document.getElementsByTagName('iframe'))
             .find(iframe => iframe.src === pdfInfo.url &&
-                c3u.getUidOfContainingBlock(iframe) === pdfInfo.uid
+                iframe.id.slice(-9) === pdfInfo.uid
             );
+        // .find(iframe => iframe.src === pdfInfo.url &&
+        //     c3u.getUidOfContainingBlock(iframe) === pdfInfo.uid
+        // );
     }
+
     ////////////////////Search the sub-tree of HL/PDF's 
     ////////////////////shared parents for the meta info
     function findPDFAttribute(pdfUid, attribute) {
@@ -670,11 +717,28 @@ function startC3Pdf2Extension() {
             case 'importCompleted':
                 handleImported(event, extracted)
                 break;
-
+            case 'toggleFullScreen':
+                handleToggleFullScreen(event, extracted)
+                break;
         }
     }
     /////////////////////////////////////////////////////////
     //////////////////All Handlers BEGIN///////////////////
+
+    function handleToggleFullScreen(event, extracted) {
+        const { iframe, fullScreen } = extracted;
+        fullScreenState = fullScreen
+        if (fullScreenState == 'Full') { //switch from half to full
+            roamAlphaAPI.ui.mainWindow.openComponent("mainFullScreen", {
+                url: iframe.src,
+                id: iframe.id,
+                uid: iframe.id.slice(-9),
+                pdf: decodePdfUrl(iframe.src),
+            });
+        } else {
+            roamAlphaAPI.ui.mainWindow.closeComponent("mainFullScreen");
+        }
+    }
     function handleImported(event, extracted) {
         const { iframe } = extracted;
         const iframeData = decodeString(c3u.blockString(iframe.dataBlockUid));
@@ -715,7 +779,7 @@ function startC3Pdf2Extension() {
 
     async function handleOpenHighlight(event, extracted) {
         // const { iframe, hlTextUid } = await extractHighlightFromMessage(event);
-        // const pdfBlockUid = iframe.uid;
+        // const pdfBlockUid = iframe.dataset.uid;
         // let hlRefParentBlockUid;
         // const hlQuery = "{{[[query]]: {and: ((" + hlTextUid + ")) {not: [[c3-pdf-highlight]]}}}}";
 
@@ -780,6 +844,7 @@ function startC3Pdf2Extension() {
         const copyBehavior = event.data?.copyBehavior;
         const versionNewName = event.data?.versionNewName;
         const versionToShow = event.data?.versionToShow;
+        const fullScreen = event.data?.fullScreen;
 
         // const isReply = event.data.annotation.isReply;
         const repliedToTextUid = event.data?.annotation?.repliedToTextUid
@@ -789,7 +854,7 @@ function startC3Pdf2Extension() {
 
         const iframe = document.getElementById(event.data.iframeId)
         let hlValue = "";
-        // const pdfAlias = `[${pdfChar}](((${iframe.uid})))`;
+        // const pdfAlias = `[${pdfChar}](((${iframe.dataset.uid})))`;
         const hlDataUid = event.data?.annotation?.dataUid;
         const hlTextUid = event.data?.annotation?.textUid;
         // const hlBtn = `{{${page}: ${hlDataUid}}}`;
@@ -812,7 +877,7 @@ function startC3Pdf2Extension() {
             iframe, hlId, hlValue, hlData, hlTextUid, hlDataUid, hlTime,
             annotType, textBlockExist, page, hexcolor, hlBtn,
             repliedToTextUid, commentTextUid, content, actionType, fromRoam,
-            printBehavior, copyBehavior, versionNewName, versionToShow
+            printBehavior, copyBehavior, versionNewName, versionToShow, fullScreen
         }
     }
     function getVersionToShowXfdf(extracted) {
@@ -832,7 +897,7 @@ function startC3Pdf2Extension() {
         const allPdfUrls = c3u.allChildrenInfo(dataPageUid)[0][0].children.slice(1);
         allPdfUrls.map(pdfurl => {
             const allPdfData = c3u.allChildrenInfo(pdfurl.uid)[0][0].children;
-            // `{{${iframe.uid}}}{{1}}{{}}`
+            // `{{${iframe.dataset.uid}}}{{1}}{{}}`
             allPdfData.map(pdfData => {
                 const pdfMeta = decodeString(pdfData.string);
                 versionsMeta[pdfData.uid] = pdfMeta
@@ -925,11 +990,11 @@ function startC3Pdf2Extension() {
             let hlRefParentBlockUid;
             //Find where to write
             if (printBehavior === 'Cousin') {
-                hlRefParentBlockUid = getUncleBlock(iframe.uid);
+                hlRefParentBlockUid = getUncleBlock(iframe.dataset.uid);
                 await c3u.sleep(100);
-                if (!hlRefParentBlockUid) hlRefParentBlockUid = iframe.uid; //there is no gparent, write hl as a child
+                if (!hlRefParentBlockUid) hlRefParentBlockUid = iframe.dataset.uid; //there is no gparent, write hl as a child
             } else { //printBehavior ==='Child'
-                hlRefParentBlockUid = iframe.uid
+                hlRefParentBlockUid = iframe.dataset.uid
             }
             let ord = (pdfParams.appendHighlight) ? 'last' : 0;
             c3u.createChildBlock(hlRefParentBlockUid, ord, taggedBlockRef, c3u.createUid());
@@ -975,7 +1040,6 @@ function startC3Pdf2Extension() {
     /*******************************************************/
     /**********Render PDF and Highlights BEGIN**************/
     /////////////////////Find pdf iframe being highlighted
-    let allPdfIframes = []; //History of opened pdf on page
 
     /////////////////////Show the PDF through the Server
     function renderPdf(iframe) {
@@ -988,7 +1052,9 @@ function startC3Pdf2Extension() {
     let iframeHighlightTimes = {};
     /////////////////////Send Old Saved Highlights to Server to Render
     async function initialHighlighSend(iframe) {
+        console.log('inside init')
         await getDataRootUid(iframe);
+        console.log('dataroot done')
         let hlsData = c3u.allChildrenInfo(iframe.dataBlockUid)[0][0].children;
         let toSendXfdf = [];
         let toKeepTime = {};
@@ -1001,7 +1067,8 @@ function startC3Pdf2Extension() {
             })
         }
         iframeHighlightTimes[iframe.id] = toKeepTime;
-        window.setTimeout(() => sendMessageToViewer(toSendXfdf, 'init', iframe), 5000);
+        const delay = fullScreenState == 'Half' ? 7000 : 7000
+        window.setTimeout(() => sendMessageToViewer(toSendXfdf, 'init', iframe), delay);
         //pullWatch should be added to iframe.dataBlockUid
         //If data block of this iframe changed call syncHighlights()   
         window.roamAlphaAPI.data.addPullWatch(
@@ -1061,7 +1128,7 @@ function startC3Pdf2Extension() {
         else {
             //first find the pdfurl (should always exist  atp)
             let res = c3u.allChildrenInfo(dataPage.pageUid)[0][0];
-            const urlBlocks = res.children.filter(child => child.string == iframe.pdf)
+            const urlBlocks = res.children.filter(child => child.string == iframe.dataset.pdf)
             if (urlBlocks.length == 0)
                 dataPage = await createDataPage(dataPageTitle, iframe, false);
             else
@@ -1069,11 +1136,11 @@ function startC3Pdf2Extension() {
             //next see if this pdf was on this block before
             res = c3u.allChildrenInfo(dataPage.urlUid)[0][0];
             if (res.children)
-                dataPage.blockUid = res.children.filter(child => decodeString(child.string).uid == iframe.uid)[0]?.uid;
+                dataPage.blockUid = res.children.filter(child => decodeString(child.string).uid == iframe.dataset.uid)[0]?.uid;
             if (!dataPage.blockUid) { //first time this pdf is read on this block
                 dataPage.blockUid = c3u.createUid();
-                //{{${iframe.uid}}}{{1}}{{ }}{{0}}
-                const iframeData = { uid: iframe.uid, resumePage: 1, versionName: ' ', alreadyImported: false }
+                //{{${iframe.dataset.uid}}}{{1}}{{ }}{{0}}
+                const iframeData = { uid: iframe.dataset.uid, resumePage: 1, versionName: ' ', alreadyImported: false }
                 c3u.createChildBlock(dataPage.urlUid, 'last', encodeString(JSON.stringify(iframeData)), dataPage.blockUid)
             }
         }
@@ -1084,7 +1151,7 @@ function startC3Pdf2Extension() {
     }
 
     async function getDataPageTitle(iframe) {
-        const universalPdfId = await fingerprint(iframe.pdf, 1024);
+        const universalPdfId = await fingerprint(iframe.dataset.pdf, 1024);
         return 'roam/js/pdf/data/' + universalPdfId;
     }
     /////////////////////Initialize a Data Page. Format is:
@@ -1097,9 +1164,9 @@ function startC3Pdf2Extension() {
             pageUid = c3u.getPageUid(pageTitle); //TODO: put this in the c3u utility
         }
         const urlUid = c3u.createUid();
-        c3u.createChildBlock(pageUid, 'last', iframe.pdf, urlUid);
+        c3u.createChildBlock(pageUid, 'last', iframe.dataset.pdf, urlUid);
         const blockUid = c3u.createUid();
-        const iframeData = { uid: iframe.uid, resumePage: 1, versionName: ' ', alreadyImported: false }
+        const iframeData = { uid: iframe.dataset.uid, resumePage: 1, versionName: ' ', alreadyImported: false }
         c3u.createChildBlock(urlUid, 0, encodeString(JSON.stringify(iframeData)), blockUid);
         await c3u.sleep(500);
         return { pageUid, urlUid, blockUid };
