@@ -257,7 +257,7 @@ function onload({ extensionAPI }) {
     pdfParams.blockQPrefix = setSettingDefault(extensionAPI, 'blockQPrefix', '');
 
     extensionAPI.settings.panel.create(panelConfig);
-    roamAlphaAPI.ui.mainWindow.registerComponent("mainFullScreen", mainFullScreen);
+    roamAlphaAPI.ui.mainWindow.registerComponent("ccc-roam-pdf-2-full-screen", mainFullScreen);
 
     startC3Pdf2Extension();
 }
@@ -267,7 +267,7 @@ let onunloadfns = [];
 
 function onunload() {
     if (hlBtnAppearsObserver) hlBtnAppearsObserver.disconnect();
-    roamAlphaAPI.ui.mainWindow.unregisterComponent("mainFullScreen");
+    roamAlphaAPI.ui.mainWindow.unregisterComponent("ccc-roam-pdf-2-full-screen");
 
     for (const f of onunloadfns) {
         console.log(f);
@@ -729,14 +729,14 @@ function startC3Pdf2Extension() {
         const { iframe, fullScreen } = extracted;
         fullScreenState = fullScreen
         if (fullScreenState == 'Full') { //switch from half to full
-            roamAlphaAPI.ui.mainWindow.openComponent("mainFullScreen", {
+            roamAlphaAPI.ui.mainWindow.openComponent("ccc-roam-pdf-2-full-screen", {
                 url: iframe.src,
                 id: iframe.id,
                 uid: iframe.id.slice(-9),
                 pdf: decodePdfUrl(iframe.src),
             });
         } else {
-            roamAlphaAPI.ui.mainWindow.closeComponent("mainFullScreen");
+            roamAlphaAPI.ui.mainWindow.closeComponent("ccc-roam-pdf-2-full-screen");
         }
     }
     function handleImported(event, extracted) {
