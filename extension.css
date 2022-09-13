@@ -14,6 +14,7 @@
 }
 
 
+
 [data-page-links*="c3-pdf-highlight"]>div>.rm-block-text {
   border: 3px solid rgb(255, 65, 65) !important;
   border-style: inset !important;
@@ -23,12 +24,15 @@
 
 .btn-ref-annotation {
   display: none;
+  /* visibility: hidden; */
 }
 
 .rm-block__input:hover .btn-ref-annotation {
   display: inline;
+  /* visibility: visible; */
   animation: fade_in_show .5s
 }
+
 
 @keyframes fade_in_show {
   0% {

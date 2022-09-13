@@ -455,7 +455,7 @@ function startC3Pdf2Extension() {
                 const type = match[1];
                 const tag = match[2];
                 if (tag[0] >= '0' && tag[0] <= '9' || tag[0] >= 'a' && tag[0] <= 'f') {//if it start with a digit => it is a hexcolor
-                    if (colorNode.previousSibling.dataset.tag != type + "BrightSun") {
+                    if (colorNode.previousSibling.dataset.tag != type + ":" + "BrightSun") {
                         const el2change = colorNode.closest('span').parentElement.closest('span');
                         const newColor = hexToRgba(tag);
                         switch (type) {
@@ -464,6 +464,11 @@ function startC3Pdf2Extension() {
                             case 's': el2change.style.textDecoration = "line-through " + newColor; break;
                             default: el2change.style.backgroundColor = newColor;
                         }
+                        // const allButtons = el2change.querySelectorAll('.btn-ref-annotation');
+                        // allButtons.forEach(hlBtn => {
+                        //     console.log(hlBtn)
+                        //     console.log(hlBtn.style.textDecoration, hlBtn.style.backgroundColor)
+                        //     hlBtn.style.textDecoration = 'none'; hlBtn.style.backgroundColor = null});
                     }
                 }
             }
@@ -489,7 +494,7 @@ function startC3Pdf2Extension() {
                     abtn.setAttribute('title',"Replace with Text");
                     abtn.addEventListener("click", (e) => { replaceWithText(e, btnBlockUid, hlInfo) });
                     break;
-                case '❌'
+                case '❌':
                     abtn.classList.add('btn-delete');
                     abtn.setAttribute('title',"Delete Highlight");
                     abtn.addEventListener("click", (e) => { deleteHighlight(e, pdfInfo, btnBlockUid, hlInfo) });
