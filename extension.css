@@ -25,15 +25,15 @@
   display: none;
 }
 
-span:hover .btn-ref-annotation {
+.rm-block__input:hover .btn-ref-annotation {
   display: inline;
-  animation: fade_in_show .8s
+  animation: fade_in_show .5s
 }
 
 @keyframes fade_in_show {
   0% {
     opacity: 0;
-    transform: scale(0)
+    transform: scale(0.95)
   }
 
   100% {

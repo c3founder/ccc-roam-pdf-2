@@ -1,3 +1,10 @@
+/*******************************************************/
+/**********************Main BEGIN***********************/
+////////Global Consts
+// const serverPerfix = 'http://localhost:3000/?url=';
+// const serverPerfix = 'https://roampdf.web.app/?url=';
+const serverPerfix = 'https://ccc-roam-pdf.web.app/?url=';
+
 const panelConfig = {
     tabTitle: "CCC Roam PDF 2.0",
     settings: [
@@ -281,12 +288,7 @@ function onunload() {
 
 function startC3Pdf2Extension() {
     var c3u = ccc.util;
-    /*******************************************************/
-    /**********************Main BEGIN***********************/
-    ////////Global Consts
-    // const serverPerfix = 'http://localhost:3000/?url=';
-    // const serverPerfix = 'https://roampdf.web.app/?url=';
-    const serverPerfix = 'https://ccc-roam-pdf.web.app/?url=';
+
 
     const HIGHLIGHTER_VERSION = '2.0';
     ////////Main function
@@ -484,18 +486,22 @@ function startC3Pdf2Extension() {
             switch (abtn.innerText) {
                 case '📋':
                     abtn.classList.add('btn-rep-text');
+                    abtn.setAttribute('title',"Replace with Text");
                     abtn.addEventListener("click", (e) => { replaceWithText(e, btnBlockUid, hlInfo) });
                     break;
-                case '❌':
+                case '❌'
                     abtn.classList.add('btn-delete');
+                    abtn.setAttribute('title',"Delete Highlight");
                     abtn.addEventListener("click", (e) => { deleteHighlight(e, pdfInfo, btnBlockUid, hlInfo) });
                     break;
                 case '💬':
                     abtn.classList.add('btn-comment');
+                    abtn.setAttribute('title',"Note/Comment");
                     abtn.addEventListener("click", (e) => { commentHighlight(e, pdfInfo, highlight, btnBlockUid, hlInfo) });
                     break;
                 default:
                     abtn.classList.add('btn-scrollto');
+                    abtn.setAttribute('title',"Jump to Highlight");
                     abtn.addEventListener("click", (e) => { jumpToHighlight(e, pdfInfo, highlight, hlInfo) });
             }
         })
